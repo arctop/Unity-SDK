@@ -29,6 +29,8 @@ public protocol ArctopSDKListener : ObjectiveC.NSObject {
 extension Swift.Array {
   public mutating func fill(_ value: Element)
 }
+public struct PredictionData {
+}
 public typealias char_p = Swift.UnsafeMutablePointer<Swift.Int8>
 #if compiler(>=5.3) && $NoncopyableGenerics
 extension Swift.UnsafeMutablePointer where Pointee == Swift.Int8 {
@@ -55,6 +57,7 @@ public protocol ArctopSDKApi {
   func checkUserCalibrationStatus() async -> Swift.Result<ArctopSDK.UserCalibrationStatus, any Swift.Error>
   func isUserLoggedIn() async throws -> Swift.Bool
   func startPredictionSession(_ predictionName: Swift.String) async -> Swift.Result<Swift.Bool, any Swift.Error>
+  func startMultiPredictionSession(_ predictionsNames: [Swift.String]) async -> Swift.Result<Swift.Bool, any Swift.Error>
   func finishSession() async -> Swift.Result<Swift.Bool, any Swift.Error>
   func terminateSessionQaFailed() async throws
   func writeMarker(markerId: Swift.Int, line: Swift.String) throws
@@ -109,9 +112,12 @@ public enum MotionDataType : Swift.String {
   @objc override dynamic public init()
   @objc deinit
 }
+public struct ArctopSDKSessionData {
+}
 public enum PredictionError : Foundation.LocalizedError {
   case ServerError
   case RealtimeServiceFailed
+  case UserModelsNotAvailable
   public var recoverySuggestion: Swift.String? {
     get
   }
@@ -189,6 +195,7 @@ public class ArctopSDKClient : ArctopSDK.ArctopSDKApi {
   public func connectSensorDevice(deviceId: Swift.String) throws
   public func disconnectSensorDevice() throws
   public func checkUserCalibrationStatus() async -> Swift.Result<ArctopSDK.UserCalibrationStatus, any Swift.Error>
+  public func startMultiPredictionSession(_ predictionsNames: [Swift.String]) async -> Swift.Result<Swift.Bool, any Swift.Error>
   public func startPredictionSession(_ predictionName: Swift.String) async -> Swift.Result<Swift.Bool, any Swift.Error>
   public func finishSession() async -> Swift.Result<Swift.Bool, any Swift.Error>
   public func terminateSessionQaFailed() async throws
