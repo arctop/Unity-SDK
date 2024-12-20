@@ -54,9 +54,13 @@ namespace com.arctop
 
         [DllImport("__Internal")]
         public static extern void arctopSDKDisconnectDevice();
-
+        
         [DllImport("__Internal")]
         public static extern void arctopSDKStartPredictions(string predictionName, SuccessCallback onSuccess,
+            FailureWithCodeCallback onFailure);
+        
+        [DllImport("__Internal")]
+        public static extern void arctopSDKStartMultiplePredictions(string predictionName, SuccessCallback onSuccess,
             FailureWithCodeCallback onFailure);
 
         [DllImport("__Internal")]
@@ -229,6 +233,23 @@ namespace com.arctop
                     break;
             }
         }
+        
+        public static void arctopSDKStartMultiplePredictions(string predictionsNames, SuccessCallback onSuccess,
+            FailureWithCodeCallback onFailure)
+        {
+            var response = mArctopSdkBridge.Call<int>("arctopSDKStartMultiplePredictions",predictionsNames);
+            switch (response)
+            {
+                case >= 0:
+                    onSuccess();
+                    break;
+                default:
+                    onFailure(response);
+                    break;
+            }
+        }
+        
+        
 
         // Stops the currently running prediction. This will also disconnect the device and upload the data to the server
         public static void arctopSDKEndPrediction(SuccessCallback onSuccess,

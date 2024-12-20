@@ -301,6 +301,29 @@ namespace com.arctop
             ArctopNativePlugin.arctopSDKStartPredictions(predictionName, onPredictionStartSuccess, onPredictionStartFailed);
 #endif
         }
+        
+        /// <summary>
+        /// Starts multiple realtime predictions
+        /// </summary>
+        /// <param name="predictions">The desired predictions to start</param>
+        public void StartMultiplePredictions(ArctopSDK.Predictions[] predictions)
+        {
+#if UNITY_EDITOR
+            onPredictionStartSuccess();
+            m_lastPredictionFrame = Time.frameCount;
+#elif UNITY_IOS || UNITY_ANDROID
+            string predictionsNames = string.Empty;
+            foreach (var prediction in predictions)
+            {
+                var predictionName = prediction.ToString().ToLower();
+                predictionsNames += predictionName + "|";
+            }
+            // remove the last one
+            predictionsNames = predictionsNames.Remove(predictionsNames.Length - 1);
+            ArctopNativePlugin.arctopSDKStartMultiplePredictions(predictionsNames, onPredictionStartSuccess, onPredictionStartFailed);
+#endif
+        }
+        
         /// <summary>
         /// Finishes the active prediction
         /// </summary>

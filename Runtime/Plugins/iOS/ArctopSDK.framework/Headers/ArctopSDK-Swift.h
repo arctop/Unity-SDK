@@ -354,6 +354,9 @@ SWIFT_EXTERN void arctopSDKSetValueChangedCallback(void (* _Nonnull valueChanged
 SWIFT_EXTERN void arctopSDKShutdown(void) SWIFT_NOEXCEPT;
 
 
+SWIFT_EXTERN void arctopSDKStartMultiplePredictions(int8_t * _Nonnull predictionsNames, void (* _Nonnull onSuccess)(void), void (* _Nonnull onFailure)(NSInteger)) SWIFT_NOEXCEPT;
+
+
 SWIFT_EXTERN void arctopSDKStartPredictions(int8_t * _Nonnull predictionName, void (* _Nonnull onSuccess)(void), void (* _Nonnull onFailure)(NSInteger)) SWIFT_NOEXCEPT;
 
 

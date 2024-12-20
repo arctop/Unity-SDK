@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.12733836, g: 0.13418846, b: 0.12118524, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1433,7 +1432,7 @@ MonoBehaviour:
   m_SplashPanel: {fileID: 175770678}
   m_MessagePanel: {fileID: 2043718911}
   startPredictionButton: {fileID: 1287496683}
-  m_PredictionToStart: 0
+  m_PredictionsToStart: 00000000
 --- !u!4 &849990888
 Transform:
   m_ObjectHideFlags: 0
