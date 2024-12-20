@@ -255,6 +255,16 @@ public class ArctopUnityBridge extends IArctopSdkListener.Stub {
         }
     }
 
+    public int arctopSDKStartMultiplePredictions(String predictionsNames)
+    {
+        String[] nameArray = predictionsNames.split("\\|");
+        try {
+            return mService.startMultiplePredictionSession(nameArray);
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     public int arctopSDKEndPrediction()
     {
