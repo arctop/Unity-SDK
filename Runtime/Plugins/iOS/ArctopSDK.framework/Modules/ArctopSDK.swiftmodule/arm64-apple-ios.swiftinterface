@@ -1,6 +1,6 @@
 // swift-interface-format-version: 1.0
 // swift-compiler-version: Apple Swift version 6.0 effective-5.10 (swiftlang-6.0.0.9.10 clang-1600.0.26.2)
-// swift-module-flags: -target arm64-apple-ios15.0 -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -Onone -enable-experimental-feature OpaqueTypeErasure -enable-bare-slash-regex -module-name ArctopSDK
+// swift-module-flags: -target arm64-apple-ios16.6 -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -Onone -enable-experimental-feature OpaqueTypeErasure -enable-bare-slash-regex -module-name ArctopSDK
 // swift-module-flags-ignorable: -no-verify-emitted-module-interface
 @_exported import ArctopSDK
 import Combine
@@ -35,10 +35,12 @@ public typealias char_p = Swift.UnsafeMutablePointer<Swift.Int8>
 #if compiler(>=5.3) && $NoncopyableGenerics
 extension Swift.UnsafeMutablePointer where Pointee == Swift.Int8 {
   public func toString() -> Swift.String
+  public func toStringArrayWithDelimiter(_ delimiter: Swift.String) -> [Swift.String]
 }
 #else
 extension Swift.UnsafeMutablePointer where Pointee == Swift.Int8 {
   public func toString() -> Swift.String
+  public func toStringArrayWithDelimiter(_ delimiter: Swift.String) -> [Swift.String]
 }
 #endif
 extension Swift.String {
@@ -277,6 +279,8 @@ public func arctopSDKScanForDevices(callback: ArctopSDK.ScanResultCallback)
 public func arctopSDKConnectToDeviceId(deviceId: ArctopSDK.char_p)
 @_cdecl("arctopSDKDisconnectDevice")
 public func arctopSDKDisconnectDevice()
+@_cdecl("arctopSDKStartMultiplePredictions")
+public func arctopSDKStartMultiplePredictions(predictionsNames: ArctopSDK.char_p, onSuccess: ArctopSDK.SuccessCallback, onFailure: ArctopSDK.FailureWithCodeCallback)
 @_cdecl("arctopSDKStartPredictions")
 public func arctopSDKStartPredictions(predictionName: ArctopSDK.char_p, onSuccess: ArctopSDK.SuccessCallback, onFailure: ArctopSDK.FailureWithCodeCallback)
 @_cdecl("arctopSDKEndPrediction")
