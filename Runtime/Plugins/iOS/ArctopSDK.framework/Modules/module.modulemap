@@ -1,0 +1,11 @@
+framework module ArctopSDK {
+  umbrella header "ArctopSDK.h"
+  export *
+
+  module * { export * }
+}
+
+module ArctopSDK.Swift {
+  header "ArctopSDK-Swift.h"
+  requires objc
+}
