@@ -1,4 +1,4 @@
-# Arctop Unity Package
+# Arctop® Unity Package
 
 The Arctop Unity package is a full-fledged SDK allowing access to Arctop's BCI functionality within the Unity ecosystem.
 
