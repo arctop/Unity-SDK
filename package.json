@@ -1,0 +1,36 @@
+{
+  "name": "com.arctop.arctopsdk",
+  "version": "0.0.1",
+  "displayName": "Arctop SDK",
+  "description": "Arctop SDK For Unity",
+  "unity": "2020.1",
+  "documentationUrl": "https://arctop.com",
+  "changelogUrl": "https://arctop.com/changelog.html",
+  "licensesUrl": "https://arctop.com/licensing.html",
+  "keywords": [
+    "Arctop",
+    "BCI"
+  ],
+  "samples": [
+    {
+      "displayName": "Arctop SDK Game Example",
+      "description": "Complete example utilizing the Arctop SDK from start to finish",
+      "path": "Samples~/GameExample"
+    },
+    {
+      "displayName": "QA Signal Example",
+      "description": "Sample Scene to show how to construct a QA Signal Screen",
+      "path": "Samples~/QA"
+    },
+    {
+      "displayName": "Android Build Files Example",
+      "description": "Collection of required Manifest / Gradle files for Android builds",
+      "path": "Samples~/AndroidBuildFiles"
+    }
+  ],
+  "author": {
+    "name": "Arctop",
+    "email": "info@arctop.com",
+    "url": "https://arctop.com"
+  }
+}

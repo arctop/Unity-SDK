@@ -1,0 +1,369 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.1 effective-5.10 (swiftlang-6.1.0.110.21 clang-1700.0.13.3)
+// swift-module-flags: -target arm64-apple-ios16.6 -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -enable-experimental-feature DebugDescriptionMacro -enable-bare-slash-regex -module-name ArctopSDK
+// swift-module-flags-ignorable: -no-verify-emitted-module-interface -interface-compiler-version 6.1
+@_exported import ArctopSDK
+import Combine
+import CoreBluetooth
+import Darwin
+import DeveloperToolsSupport
+import Foundation
+import Swift
+import SwiftUI
+import UIKit
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+import os.log
+import os
+public struct ArctopPredictionData : Swift.Codable {
+  public let PredictionId: Swift.String
+  public let PredictionName: Swift.String
+  public let CalibrationStatus: ArctopSDK.UserCalibrationStatus
+  public let iconKey: Swift.String
+  public func encode(to encoder: any Swift.Encoder) throws
+  public init(from decoder: any Swift.Decoder) throws
+}
+public protocol ArctopSDKListener : ObjectiveC.NSObject {
+  func onConnectionChanged(previousConnection: ArctopSDK.ConnectionState, currentConnection: ArctopSDK.ConnectionState)
+  func onMotionData(motionData: [Swift.Float], motionType: ArctopSDK.MotionDataType)
+  func onValueChanged(key: Swift.String, value: Swift.Float)
+  func onQAStatus(passed: Swift.Bool, type: ArctopSDK.QAFailureType)
+  func onError(errorCode: any Swift.Error, message: Swift.String)
+  func onDeviceListUpdated(headwareDeviceList: [Swift.String])
+}
+extension Swift.Array {
+  public mutating func fill(_ value: Element)
+}
+public struct PredictionData {
+}
+public typealias char_p = Swift.UnsafeMutablePointer<Swift.Int8>
+extension Swift.UnsafeMutablePointer where Pointee == Swift.Int8 {
+  public func toString() -> Swift.String
+  public func toStringArrayWithDelimiter(_ delimiter: Swift.String) -> [Swift.String]
+}
+extension Swift.String {
+  public func toCharPCopy() -> ArctopSDK.char_p
+}
+public protocol ArctopSDKApi {
+  func initializeArctop(apiKey: Swift.String, bundle: Foundation.Bundle) async -> Swift.Result<Swift.Bool, any Swift.Error>
+  func deinitializeArctop()
+  func loginUser(otp: Swift.String) async -> Swift.Result<Swift.Void, any Swift.Error>
+  func loginUser() async -> Swift.Result<Swift.Void, any Swift.Error>
+  func logoutUser() async throws
+  func scanForAvailableDevices() throws
+  func terminateScanForDevices() throws
+  func connectSensorDevice(deviceId: Swift.String) throws
+  func disconnectSensorDevice() throws
+  func checkUserCalibrationStatus(predictionId: Swift.String) -> ArctopSDK.UserCalibrationStatus
+  func checkUserCalibrationsStatus(predictionsIds: [Swift.String]) -> [ArctopSDK.ArctopPredictionData]
+  func isUserLoggedIn() async throws -> Swift.Bool
+  func startPredictionSession(_ predictionId: Swift.String) async -> Swift.Result<Swift.Bool, any Swift.Error>
+  func startMultiPredictionSession(_ predictionsId: [Swift.String]) async -> Swift.Result<Swift.Bool, any Swift.Error>
+  func finishSession() async -> Swift.Result<Swift.Bool, any Swift.Error>
+  func terminateSessionQaFailed() async throws
+  func writeMarker(markerId: Swift.Int, line: Swift.String) throws
+  func writeTimedMarker(markerId: Swift.Int, line: Swift.String, timeStamp: Swift.Int64) throws
+  func registerListener(listener: any ArctopSDK.ArctopSDKListener)
+  func unregisterListener(listener: any ArctopSDK.ArctopSDKListener)
+  func registerListener(listener: any ArctopSDK.ArctopSDKQAListener)
+  func unregisterListener(listener: any ArctopSDK.ArctopSDKQAListener)
+  var clientAllowedPredictions: [Swift.String] { get }
+}
+public enum UserCalibrationStatus : Swift.Int, Swift.Codable {
+  case unknown, blocked, needsCalibration, calibrationDone, modelsAvailable, lockedByOthers
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum MotionDataType : Swift.String {
+  case accelerometer
+  case gyroscope
+  public init?(rawValue: Swift.String)
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+@_hasMissingDesignatedInitializers public class UnitySDKAccessPoint {
+  public static let sdkClient: ArctopSDK.ArctopSDKClient
+  public static let listener: ArctopSDK.UnitySDKListener
+  public static func registerListener()
+  public static func unregisterListener()
+  @objc deinit
+}
+@objc @_inheritsConvenienceInitializers public class UnitySDKListener : ObjectiveC.NSObject, ArctopSDK.ArctopSDKListener, ArctopSDK.ArctopSDKQAListener, ArctopSDK.ArctopSDKSessionUploadListener {
+  public var scanResultCallback: ArctopSDK.ScanResultCallback?
+  public var connectionStatusCallback: ArctopSDK.ConnectionStatusCallback?
+  public var valueChangedCallback: ArctopSDK.ValueChangedCallback?
+  public var qaStatusCallback: ArctopSDK.QAStatusCallback?
+  public var signalQualityCallback: ArctopSDK.SignalQualityCallback?
+  public func onConnectionChanged(previousConnection: ArctopSDK.ConnectionState, currentConnection: ArctopSDK.ConnectionState)
+  public func onMotionData(motionData: [Swift.Float], motionType: ArctopSDK.MotionDataType)
+  public func onValueChanged(key: Swift.String, value: Swift.Float)
+  public func onQAStatus(passed: Swift.Bool, type: ArctopSDK.QAFailureType)
+  public func onError(errorCode: any Swift.Error, message: Swift.String)
+  public func onDeviceListUpdated(headwareDeviceList: [Swift.String])
+  public func onSignalQuality(quality: Swift.String)
+  public func onHeadbandStatusChange(headbandOn: Swift.Bool)
+  public func onBatteryStatus(chargeLeft: Swift.Float)
+  public func onDevicePluggedInStatusChange(pluggedIn: Swift.Bool)
+  public func onUploadStatus(status: ArctopSDK.UploadStatus)
+  public func onUploadProgress(current: Swift.Int, total: Swift.Int)
+  @objc override dynamic public init()
+  @objc deinit
+}
+public struct UserFiles : Swift.Identifiable {
+  public var id: Swift.String {
+    get
+  }
+  public var filenames: [Swift.String]
+  public let sessionId: Swift.String
+  public let sessionCreatedAt: Foundation.Date
+  public let sessionIcons: [Swift.String]
+  public typealias ID = Swift.String
+}
+public struct ArctopSDKSessionData {
+}
+public enum PredictionError : Foundation.LocalizedError {
+  case ServerError
+  case RealtimeServiceFailed
+  case UserModelsNotAvailable
+  public var recoverySuggestion: Swift.String? {
+    get
+  }
+  public static func == (a: ArctopSDK.PredictionError, b: ArctopSDK.PredictionError) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public enum UploadStatus : Swift.String {
+  case starting, archiving, uploading, success, failed
+  public init?(rawValue: Swift.String)
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+@_Concurrency.MainActor @preconcurrency public struct QAView : SwiftUICore.View {
+  @_Concurrency.MainActor @preconcurrency public init(qaColors: SwiftUICore.Binding<[[SwiftUICore.Color]]>, isHeadbandOn: SwiftUICore.Binding<Swift.Bool>)
+  @_Concurrency.MainActor @preconcurrency public var body: some SwiftUICore.View {
+    get
+  }
+  public typealias Body = @_opaqueReturnTypeOf("$s9ArctopSDK6QAViewV4bodyQrvp", 0) __
+}
+extension os.OSLog {
+  convenience public init(category: Swift.String)
+}
+public enum QAFailureType : Swift.Int {
+  case passed
+  case headbandOffHead
+  case motionTooHigh
+  case eegFailure
+  public var description: Swift.String {
+    get
+  }
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum ArctopSDKError : Swift.Error {
+  case unknownError, apiKeyInvalid, sdkAlreadyInitialized, sdkNotInitialized, predicitionUnauthorized, predictionNotCalibrated
+  public static func == (a: ArctopSDK.ArctopSDKError, b: ArctopSDK.ArctopSDKError) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public enum ConnectionState : Swift.Int {
+  case unknown, connecting, connected, connectionFailed, disconnected, disconnectedUponRequest
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum QAQuality {
+  case perfect, good, normal
+  public static func == (a: ArctopSDK.QAQuality, b: ArctopSDK.QAQuality) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public class ArctopSDKClient : ArctopSDK.ArctopSDKApi {
+  public var clientAllowedPredictions: [Swift.String] {
+    get
+  }
+  public init()
+  @objc deinit
+  public func initializeArctop(apiKey: Swift.String, bundle: Foundation.Bundle) async -> Swift.Result<Swift.Bool, any Swift.Error>
+  public func deinitializeArctop()
+  public func loginUser(otp: Swift.String) async -> Swift.Result<Swift.Void, any Swift.Error>
+  public func loginUser() async -> Swift.Result<Swift.Void, any Swift.Error>
+  public func logoutUser() async throws
+  public func isUserLoggedIn() async throws -> Swift.Bool
+  public func scanForAvailableDevices() throws
+  public func terminateScanForDevices() throws
+  public func connectSensorDevice(deviceId: Swift.String) throws
+  public func disconnectSensorDevice() throws
+  public func checkUserCalibrationStatus(predictionId: Swift.String) -> ArctopSDK.UserCalibrationStatus
+  public func checkUserCalibrationsStatus(predictionsIds: [Swift.String]) -> [ArctopSDK.ArctopPredictionData]
+  public func startMultiPredictionSession(_ predictionsIds: [Swift.String]) async -> Swift.Result<Swift.Bool, any Swift.Error>
+  public func startPredictionSession(_ predictionId: Swift.String) async -> Swift.Result<Swift.Bool, any Swift.Error>
+  public func finishSession() async -> Swift.Result<Swift.Bool, any Swift.Error>
+  public func terminateSessionQaFailed() async throws
+  public func writeUserMarker(_ text: Swift.String, timeStamp: Swift.Int64) throws
+  public func writeMarker(markerId: Swift.Int, line: Swift.String) throws
+  public func writeTimedMarker(markerId: Swift.Int, line: Swift.String, timeStamp: Swift.Int64) throws
+  public func registerListener(listener: any ArctopSDK.ArctopSDKListener)
+  public func unregisterListener(listener: any ArctopSDK.ArctopSDKListener)
+  public func registerListener(listener: any ArctopSDK.ArctopSDKQAListener)
+  public func unregisterListener(listener: any ArctopSDK.ArctopSDKQAListener)
+}
+public enum ArctopNetworkError : Swift.Error {
+  case serverError, notAutherized
+  public static func == (a: ArctopSDK.ArctopNetworkError, b: ArctopSDK.ArctopNetworkError) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public class QAViewModel : Combine.ObservableObject {
+  public var onQaPassed: () -> Swift.Void
+  public init()
+  public func start(quality: ArctopSDK.QAQuality)
+  public func stop()
+  @Combine.Published @_projectedValueProperty($isHeadbandOn) public var isHeadbandOn: Swift.Bool {
+    get
+    @available(iOS 13.0, tvOS 13.0, watchOS 6.0, macOS 10.15, *)
+    set
+  }
+  public var $isHeadbandOn: Combine.Published<Swift.Bool>.Publisher {
+    get
+    @available(iOS 14.0, tvOS 14.0, watchOS 7.0, macOS 11.0, *)
+    set
+  }
+  @Combine.Published @_projectedValueProperty($qaColors) public var qaColors: [[SwiftUICore.Color]] {
+    get
+    @available(iOS 13.0, tvOS 13.0, watchOS 6.0, macOS 10.15, *)
+    set
+    @available(iOS 13.0, tvOS 13.0, watchOS 6.0, macOS 10.15, *)
+    _modify
+  }
+  public var $qaColors: Combine.Published<[[SwiftUICore.Color]]>.Publisher {
+    get
+    @available(iOS 14.0, tvOS 14.0, watchOS 7.0, macOS 11.0, *)
+    set
+  }
+  public var qaString: Swift.String {
+    get
+    set
+  }
+  public typealias ObjectWillChangePublisher = Combine.ObservableObjectPublisher
+  @objc deinit
+}
+public typealias SuccessCallback = @convention(c) () -> Swift.Void
+public typealias SuccessWithIntCallback = @convention(c) (Swift.Int) -> Swift.Void
+public typealias FailureWithCodeCallback = @convention(c) (Swift.Int) -> Swift.Void
+public typealias IsUserLoggedInCallback = @convention(c) (Swift.Bool) -> Swift.Void
+public typealias ScanResultCallback = @convention(c) (ArctopSDK.char_p) -> Swift.Void
+public typealias ConnectionStatusCallback = @convention(c) (Swift.Int, Swift.Int) -> Swift.Void
+public typealias ValueChangedCallback = @convention(c) (ArctopSDK.char_p, Swift.Float) -> Swift.Void
+public typealias QAStatusCallback = @convention(c) (Swift.Bool, Swift.Int) -> Swift.Void
+public typealias SignalQualityCallback = @convention(c) (ArctopSDK.char_p) -> Swift.Void
+public typealias CalibrationsStatusCallback = @convention(c) (ArctopSDK.char_p) -> Swift.Void
+@_cdecl("arctopSDKInit")
+public func arctopSDKInit(apiKey: ArctopSDK.char_p, bundleId: ArctopSDK.char_p, onSuccess: ArctopSDK.SuccessCallback, onFailure: ArctopSDK.FailureWithCodeCallback)
+@_cdecl("arctopSDKShutdown")
+public func arctopSDKShutdown()
+@_cdecl("arctopSDKLogin")
+public func arctopSDKLogin(otp: ArctopSDK.char_p, onSuccess: ArctopSDK.SuccessCallback, onFailure: ArctopSDK.FailureWithCodeCallback)
+@_cdecl("arctopSDKIsUserLoggedIn")
+public func arctopSDKIsUserLoggedIn(isLoggedIn: ArctopSDK.IsUserLoggedInCallback)
+@_cdecl("arctopSDKLogout")
+public func arctopSDKLogout(onComplete: ArctopSDK.SuccessCallback, onFailure: ArctopSDK.FailureWithCodeCallback)
+@_cdecl("arctopSDKGetAvailablePredictions")
+public func arctopSDKGetAvailablePredictions(onSuccess: ArctopSDK.CalibrationsStatusCallback)
+@_cdecl("arctopSDKGetUserCalibrationStatus")
+public func arctopSDKGetUserCalibrationStatus(predictionId: ArctopSDK.char_p, onSuccess: ArctopSDK.SuccessWithIntCallback)
+@_cdecl("arctopSDKGetUserCalibrationsStatus")
+public func arctopSDKGetUserCalibrationsStatus(predictionsIds: ArctopSDK.char_p, onSuccess: ArctopSDK.CalibrationsStatusCallback)
+@_cdecl("arctopSDKScanForDevices")
+public func arctopSDKScanForDevices(callback: ArctopSDK.ScanResultCallback)
+@_cdecl("arctopSDKConnectToDeviceId")
+public func arctopSDKConnectToDeviceId(deviceId: ArctopSDK.char_p)
+@_cdecl("arctopSDKDisconnectDevice")
+public func arctopSDKDisconnectDevice()
+@_cdecl("arctopSDKStartMultiplePredictions")
+public func arctopSDKStartMultiplePredictions(predictionsIds: ArctopSDK.char_p, onSuccess: ArctopSDK.SuccessCallback, onFailure: ArctopSDK.FailureWithCodeCallback)
+@_cdecl("arctopSDKStartPredictions")
+public func arctopSDKStartPredictions(predictionId: ArctopSDK.char_p, onSuccess: ArctopSDK.SuccessCallback, onFailure: ArctopSDK.FailureWithCodeCallback)
+@_cdecl("arctopSDKEndPrediction")
+public func arctopSDKEndPrediction(onSuccess: ArctopSDK.SuccessCallback, onFailure: ArctopSDK.FailureWithCodeCallback)
+@_cdecl("arctopSDKWriteUserMarker")
+public func arctopSDKWriteUserMarker(markerData: ArctopSDK.char_p)
+@_cdecl("arctopSDKSetConnectionCallback")
+public func arctopSDKSetConnectionCallback(connectionStatusCallback: ArctopSDK.ConnectionStatusCallback)
+@_cdecl("arctopSDKSetQAStatusCallback")
+public func arctopSDKSetQAStatusCallback(qaStatusCallback: ArctopSDK.QAStatusCallback)
+@_cdecl("arctopSDKSetValueChangedCallback")
+public func arctopSDKSetValueChangedCallback(valueChangedCallback: ArctopSDK.ValueChangedCallback)
+@_cdecl("arctopSDKSetSignalQualityCallback")
+public func arctopSDKSetSignalQualityCallback(signalQualityCallback: ArctopSDK.SignalQualityCallback)
+public struct UserModelsStatus {
+  public var preditionTitle: Swift.String
+  public var predictionId: Swift.String
+  public var modelId: Swift.String
+  public var predictionName: Swift.String
+  public var calibrationStatus: ArctopSDK.UserCalibrationStatus
+  public var calibrationMessage: Swift.String
+  public var hidden: Swift.Bool
+  public var iconKey: Swift.String
+}
+public protocol ArctopSDKQAListener : ObjectiveC.NSObject {
+  func onSignalQuality(quality: Swift.String)
+  func onHeadbandStatusChange(headbandOn: Swift.Bool)
+  func onBatteryStatus(chargeLeft: Swift.Float)
+  func onDevicePluggedInStatusChange(pluggedIn: Swift.Bool)
+  func onConnectionChanged(previousConnection: ArctopSDK.ConnectionState, currentConnection: ArctopSDK.ConnectionState)
+}
+public protocol ArctopSDKSessionUploadListener : ObjectiveC.NSObject {
+  func onUploadStatus(status: ArctopSDK.UploadStatus)
+  func onUploadProgress(current: Swift.Int, total: Swift.Int)
+}
+extension Foundation.Date {
+  public func unixTimeMS() -> Swift.Int64
+  public func unixTimeSeconds() -> Swift.Int64
+  public static func fromUnixTimeMS(_ time: Swift.Int64) -> Foundation.Date
+  public static func fromUTCString(_ utcString: Swift.String) -> Foundation.Date
+}
+extension ArctopSDK.UserCalibrationStatus : Swift.Equatable {}
+extension ArctopSDK.UserCalibrationStatus : Swift.Hashable {}
+extension ArctopSDK.UserCalibrationStatus : Swift.RawRepresentable {}
+extension ArctopSDK.MotionDataType : Swift.Equatable {}
+extension ArctopSDK.MotionDataType : Swift.Hashable {}
+extension ArctopSDK.MotionDataType : Swift.RawRepresentable {}
+extension ArctopSDK.PredictionError : Swift.Equatable {}
+extension ArctopSDK.PredictionError : Swift.Hashable {}
+extension ArctopSDK.UploadStatus : Swift.Equatable {}
+extension ArctopSDK.UploadStatus : Swift.Hashable {}
+extension ArctopSDK.UploadStatus : Swift.RawRepresentable {}
+extension ArctopSDK.QAView : Swift.Sendable {}
+extension ArctopSDK.QAFailureType : Swift.Equatable {}
+extension ArctopSDK.QAFailureType : Swift.Hashable {}
+extension ArctopSDK.QAFailureType : Swift.RawRepresentable {}
+extension ArctopSDK.ArctopSDKError : Swift.Equatable {}
+extension ArctopSDK.ArctopSDKError : Swift.Hashable {}
+extension ArctopSDK.ConnectionState : Swift.Equatable {}
+extension ArctopSDK.ConnectionState : Swift.Hashable {}
+extension ArctopSDK.ConnectionState : Swift.RawRepresentable {}
+extension ArctopSDK.QAQuality : Swift.Equatable {}
+extension ArctopSDK.QAQuality : Swift.Hashable {}
+extension ArctopSDK.ArctopNetworkError : Swift.Equatable {}
+extension ArctopSDK.ArctopNetworkError : Swift.Hashable {}
