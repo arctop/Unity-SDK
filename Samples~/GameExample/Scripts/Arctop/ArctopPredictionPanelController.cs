@@ -23,7 +23,7 @@ public class ArctopPredictionPanelController : MonoBehaviour
             if (m_calibratedPredictions.Length > i)
             {
                 var text = predictionToggles[i].GetComponentInChildren<Text>();
-                text.text = m_calibratedPredictions[i].PredictionName;
+                text.text = m_calibratedPredictions[i].PredictionTitle;
                 predictionToggles[i].SetActive(true);
                 hasOne = true;
             }
