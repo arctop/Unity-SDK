@@ -4981,15 +4981,18 @@ MonoBehaviour:
   m_currentDebugConnection: 0
   m_debugPredictionData:
   - PredictionId: id1
-    PredictionName: Fake Prediction 1
+    PredictionName: pred_one
+    PredictionTitle: First Prediction
     CalibrationStatus: 2
     iconKey: 
   - PredictionId: id2
-    PredictionName: Fake Prediction 2
+    PredictionName: pred_two
+    PredictionTitle: Fake Prediction
     CalibrationStatus: 2
     iconKey: 
   - PredictionId: id3
-    PredictionName: Fake Prediction 3
+    PredictionName: pred_three
+    PredictionTitle: Mock Prediction
     CalibrationStatus: 2
     iconKey: 
   OnUserLoggedIn:

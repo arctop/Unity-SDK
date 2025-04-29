@@ -120,6 +120,7 @@ namespace com.arctop
         {
             public string PredictionId;
             public string PredictionName;
+            public string PredictionTitle;
             public UserCalibrationStatus CalibrationStatus;
             public string iconKey;
         }

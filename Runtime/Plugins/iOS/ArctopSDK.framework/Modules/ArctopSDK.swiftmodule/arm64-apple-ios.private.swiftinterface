@@ -19,6 +19,7 @@ import os
 public struct ArctopPredictionData : Swift.Codable {
   public let PredictionId: Swift.String
   public let PredictionName: Swift.String
+  public let PredictionTitle: Swift.String
   public let CalibrationStatus: ArctopSDK.UserCalibrationStatus
   public let iconKey: Swift.String
   public func encode(to encoder: any Swift.Encoder) throws
@@ -34,8 +35,6 @@ public protocol ArctopSDKListener : ObjectiveC.NSObject {
 }
 extension Swift.Array {
   public mutating func fill(_ value: Element)
-}
-public struct PredictionData {
 }
 public typealias char_p = Swift.UnsafeMutablePointer<Swift.Int8>
 extension Swift.UnsafeMutablePointer where Pointee == Swift.Int8 {
@@ -115,18 +114,6 @@ public enum MotionDataType : Swift.String {
   @objc override dynamic public init()
   @objc deinit
 }
-public struct UserFiles : Swift.Identifiable {
-  public var id: Swift.String {
-    get
-  }
-  public var filenames: [Swift.String]
-  public let sessionId: Swift.String
-  public let sessionCreatedAt: Foundation.Date
-  public let sessionIcons: [Swift.String]
-  public typealias ID = Swift.String
-}
-public struct ArctopSDKSessionData {
-}
 public enum PredictionError : Foundation.LocalizedError {
   case ServerError
   case RealtimeServiceFailed
@@ -149,7 +136,7 @@ public enum UploadStatus : Swift.String {
   }
 }
 @_Concurrency.MainActor @preconcurrency public struct QAView : SwiftUICore.View {
-  @_Concurrency.MainActor @preconcurrency public init(qaColors: SwiftUICore.Binding<[[SwiftUICore.Color]]>, isHeadbandOn: SwiftUICore.Binding<Swift.Bool>)
+  @_Concurrency.MainActor @preconcurrency public init(qaColors: SwiftUICore.Binding<[[SwiftUICore.Color]]>, isHeadbandOn: SwiftUICore.Binding<Swift.Bool>, backgroundColor: SwiftUICore.Color? = nil, headwearOffWarningFont: SwiftUICore.Font? = nil, headwearOffWarningFontForegrounColor: SwiftUICore.Color? = nil, headwearOffWarningBackgroundColor: SwiftUICore.Color? = nil)
   @_Concurrency.MainActor @preconcurrency public var body: some SwiftUICore.View {
     get
   }
@@ -316,16 +303,6 @@ public func arctopSDKSetQAStatusCallback(qaStatusCallback: ArctopSDK.QAStatusCal
 public func arctopSDKSetValueChangedCallback(valueChangedCallback: ArctopSDK.ValueChangedCallback)
 @_cdecl("arctopSDKSetSignalQualityCallback")
 public func arctopSDKSetSignalQualityCallback(signalQualityCallback: ArctopSDK.SignalQualityCallback)
-public struct UserModelsStatus {
-  public var preditionTitle: Swift.String
-  public var predictionId: Swift.String
-  public var modelId: Swift.String
-  public var predictionName: Swift.String
-  public var calibrationStatus: ArctopSDK.UserCalibrationStatus
-  public var calibrationMessage: Swift.String
-  public var hidden: Swift.Bool
-  public var iconKey: Swift.String
-}
 public protocol ArctopSDKQAListener : ObjectiveC.NSObject {
   func onSignalQuality(quality: Swift.String)
   func onHeadbandStatusChange(headbandOn: Swift.Bool)
