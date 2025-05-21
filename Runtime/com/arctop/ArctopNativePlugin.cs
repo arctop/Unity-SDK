@@ -24,9 +24,10 @@ namespace com.arctop
         public delegate void QAStatusCallback(bool passed, int errorCode);
         // delegate for signalQuality
         public delegate void SignalQualityCallback(string signalQuality);
-        // delegate for calibrations status (multiples)
-        public delegate void CalibrationsStatusCallback(string calibrationsStatus);
-        
+        // delegate for returning JSON of Allowed Predictions IDs
+        public delegate void AllowedPredictionsDataCallback(string predictionData);
+        // delegate for returning JSON of ArctopPredictionData
+        public delegate void UserPredictionDataCallback(string predictionData);
 #if UNITY_IOS
         [DllImport("__Internal")]
         public static extern void arctopSDKInit(string apiKey, string bundleId, SuccessCallback onSuccess, FailureWithCodeCallback onFailure);
@@ -44,13 +45,13 @@ namespace com.arctop
         public static extern void arctopSDKIsUserLoggedIn(IsUserLoggedInCallback isLoggedIn);
 
         [DllImport("__Internal")]
-        public static extern void arctopSDKGetUserCalibrationStatus(string predictionId , SuccessWithIntCallback onSuccess);
-        
+        public static extern void arctopSDKGetAvailablePredictions(AllowedPredictionsDataCallback onSuccess);
+
         [DllImport("__Internal")]
-        public static extern void arctopSDKGetUserCalibrationsStatus(string predictionsIds , CalibrationsStatusCallback onSuccess);
-        
+        public static extern void arctopSDKGetUserPredictionData(UserPredictionDataCallback onSuccess);
+
         [DllImport("__Internal")]
-        public static extern void arctopSDKGetAvailablePredictions(CalibrationsStatusCallback onSuccess);
+        public static extern void arctopSDKRequestPermissions(SuccessWithIntCallback onSuccess);
 
         [DllImport("__Internal")]
         public static extern void arctopSDKScanForDevices(ScanResultCallback callback);

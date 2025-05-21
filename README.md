@@ -54,12 +54,14 @@ These two classes are the heart of the package. Other classes and their purpose 
 
 The SDK flow is important to understand, and is described in the [documentation above](#sdk-documentation).
 
-To recap, the flow is Permissions/Binding(Android only) -> Init -> Check login status -> Login -> Check calibration status -> Scan device -> Connect -> Run predictions -> Shut down.
+To recap, the flow is Service Permissions/Binding(Android only) -> Init -> Check login status -> Login -> Check calibration / permissions status -> Scan device -> Connect -> Run predictions -> Shut down.
 
-## Permissions (Android only)
+## Service Permissions (Android only)
 
 The _ArctopAndroidSDKPermissionBehaviour.cs_ is available to provide handling of the Arctop data permission a user must grant your app before SDK initialization can occur.
-The behavior is configured to run, create, and initialize the native SDK once permission is granted. Alternatively, you can handle permissions on your own.
+The behavior is configured to run, create, and initialize the native SDK once permission is granted. Alternatively, you can handle Service Permissions on your own.
+
+Please note this is different from the per-app data permissions the user has to provide.
 
 Since under the hood the SDK operates as an Android service, the Unity client needs to bind to that service before Initializing.
 
@@ -86,7 +88,7 @@ Every init call needs to be offset by a destroy call. **However**, there is no n
 The package contains a few examples. 
 
 The main one **Game Example** demonstrates a complete project setup.
-The scene named **ArctopSDKStartHere** is set up with UI to handle the entire initial setup, following the (Permissions) → Init → Login → Scan → Connect → Start Prediction steps.
+The scene named **ArctopSDKStartHere** is set up with UI to handle the entire initial setup, following the (Service Permissions) → Init → Login → Verify Calibration / Permission → Scan → Connect → Start Prediction steps.
 
 Once Start Prediction is called and succeeds, the app will change scene to the scene that is defined on the ArctopScanController component, on the Scan Panel Object.
 

@@ -68,27 +68,34 @@ namespace com.arctop
         /// </summary>
         [SerializeField] [Tooltip("Allows you to change the connection status in editor")]
         private ArctopSDK.ConnectionState m_currentDebugConnection = ArctopSDK.ConnectionState.Unknown;
-
+        /// <summary>
+        /// In Editor permission request response
+        /// </summary>
+        [SerializeField] [Tooltip("Simulate the user's response to requset permission call")]
+        private ArctopSDK.PermissionRequestResult m_debugPermissionResult = ArctopSDK.PermissionRequestResult.Granted;
         [SerializeField] [Tooltip("Setup your debug data here")]
         private ArctopSDK.ArctopPredictionData[] m_debugPredictionData = new []
         {
             new ArctopSDK.ArctopPredictionData{
-             PredictionId = "id1",
-             PredictionName = "Fake Prediction 1",
-             CalibrationStatus = ArctopSDK.UserCalibrationStatus.ModelsAvailable,
-             iconKey = String.Empty
+             predictionId = "id1",
+             predictionName = "Fake Prediction 1",
+             calibrationStatus = ArctopSDK.UserCalibrationStatus.ModelsAvailable,
+             iconKey = String.Empty,
+             predictionPermissionStatus = true
             },
             new ArctopSDK.ArctopPredictionData{
-                PredictionId = "id2",
-                PredictionName = "Fake Prediction 2",
-                CalibrationStatus = ArctopSDK.UserCalibrationStatus.ModelsAvailable,
-                iconKey = String.Empty
+                predictionId = "id2",
+                predictionName = "Fake Prediction 2",
+                calibrationStatus = ArctopSDK.UserCalibrationStatus.ModelsAvailable,
+                iconKey = String.Empty,
+                predictionPermissionStatus = true
             },
             new ArctopSDK.ArctopPredictionData{
-                PredictionId = "id3",
-                PredictionName = "Fake Prediction 3",
-                CalibrationStatus = ArctopSDK.UserCalibrationStatus.ModelsAvailable,
-                iconKey = String.Empty
+                predictionId = "id3",
+                predictionName = "Fake Prediction 3",
+                calibrationStatus = ArctopSDK.UserCalibrationStatus.ModelsAvailable,
+                iconKey = String.Empty,
+                predictionPermissionStatus = false
             },
         };
         // Response events. Use these to react to SDK messages
@@ -121,15 +128,21 @@ namespace com.arctop
         /// <summary>
         /// Callback for user calibration status
         /// </summary>
+        [Obsolete("Used for android legacy only at this point")]
         [SerializeField] private UnityEvent<ArctopSDK.UserCalibrationStatus> OnCalibrationStatus;
-        /// <summary>
-        /// Callback for user calibration status when asking for multiple prediction s
-        /// </summary>
-        [SerializeField] private UnityEvent<ArctopSDK.ArctopPredictionData[]> OnCalibrationsStatus;
         /// <summary>
         /// Callback when an error occured trying to retrieve user calibration status
         /// </summary>
+        [Obsolete("Used for android legacy only at this point")]
         [SerializeField] private UnityEvent<ArctopSDK.ResponseCodes> OnCalibrationStatusError;
+        /// <summary>
+        /// Callback for user prediction data and status
+        /// </summary>
+        [SerializeField] private UnityEvent<ArctopSDK.ArctopPredictionData[]> OnUserPredictionData;
+        /// <summary>
+        /// Callback for requesting Arctop predictions permissions
+        /// </summary>
+        [SerializeField] private UnityEvent<ArctopSDK.PermissionRequestResult> OnPermissionRequestResult;
         /// <summary>
         /// Callback with the new device list containing all discoverd headbands
         /// </summary>
@@ -222,7 +235,8 @@ namespace com.arctop
             ArctopNativePlugin.arctopSDKIsUserLoggedIn(onUserLoggedInCheck);
 #endif
         }
-        
+#if UNITY_ANDROID 
+        // TODO: This is here to support Android legacy and should be removed
         /// <summary>
         /// Gets the current user's calibration status for this prediction
         /// </summary>
@@ -230,36 +244,33 @@ namespace com.arctop
         {
 #if UNITY_EDITOR
             AddAction(() => { instance.OnCalibrationStatus.Invoke(m_SimulatedUserCalibrationResponse); });
-#elif UNITY_IOS
-            ArctopNativePlugin.arctopSDKGetUserCalibrationStatus(predictionId , onCalibrationStatusSuccess);
-#elif UNITY_ANDROID 
+#else
             // TODO: This will need to be adjusted for android 1.14
             ArctopNativePlugin.arctopSDKGetUserCalibrationStatus(onCalibrationStatusSuccess, onCalibrationStatusFailure );
 #endif
         }
-        
+#endif
         /// <summary>
-        /// Gets the current user's calibration status for multiple predictions
+        /// Gets the current user's prediction data status
         /// </summary>
-        public void GetUserCalibrationsStatus(ArctopSDK.UnityPredictionIds forPredictionsIds)
+        public void GetUserPredictionDataStatus()
         {
  #if UNITY_EDITOR
             #if UNITY_IOS
             var array = new ArctopSDK.ArctopPredictionDataArray
             {
-                
                 dataArray = m_debugPredictionData
             };
-            onCalibrationsStatusSuccess(JsonUtility.ToJson(array));
+            onUserPredictionData(JsonUtility.ToJson(array));
             #elif UNITY_ANDROID
             GetUserCalibrationStatus(ArctopSDK.ZONE_PREDICTION);
             #endif
+            
 #elif UNITY_IOS
-            var jsonData = JsonUtility.ToJson(forPredictionsIds);
-            ArctopNativePlugin.arctopSDKGetUserCalibrationsStatus(jsonData, onCalibrationsStatusSuccess);
+            ArctopNativePlugin.arctopSDKGetUserPredictionData(onUserPredictionData);
 #elif UNITY_ANDROID
             //TODO: Current workaround for android until we update to 1.14
-            GetUserCalibrationStatus(forPredictionsIds.predictionsIds[0]);
+            GetUserCalibrationStatus(ArctopSDK.ZONE_PREDICTION);
 #endif
         }
         
@@ -269,7 +280,7 @@ namespace com.arctop
             var ids = new string[m_debugPredictionData.Length];
             for (int i = 0; i < m_debugPredictionData.Length; i++)
             {
-                ids[i] = m_debugPredictionData[i].PredictionId;
+                ids[i] = m_debugPredictionData[i].predictionId;
             }
             var data = new ArctopSDK.UnityPredictionIds
             {
@@ -289,7 +300,17 @@ namespace com.arctop
             onAvailablePredictions(JsonUtility.ToJson(predictions));
 #endif
         }
-        
+
+        public void RequestPredictionPermissions()
+        {
+            #if UNITY_EDITOR
+            onPermissionRequestResult((int)m_debugPermissionResult);
+            #elif UNITY_IOS
+            ArctopNativePlugin.arctopSDKRequestPermissions(onPermissionRequestResult);
+            #endif
+            // TODO: No Android implementation yet
+        }
+
         /// <summary>
         /// Logs a user in using either OTP (iOS) or launching the login page in Android
         /// </summary>
@@ -605,7 +626,8 @@ namespace com.arctop
         {
             AddAction( ()=> { instance.IsUserLoggedIn.Invoke(loggedIn); });
         }
-
+#if UNITY_ANDROID
+        // TODO: This is here to support Android legacy
         [MonoPInvokeCallback(typeof(ArctopNativePlugin.SuccessWithIntCallback))]
         private static void onCalibrationStatusSuccess(int status)
         {
@@ -618,6 +640,7 @@ namespace com.arctop
         {
             AddAction(() => { instance.OnCalibrationStatusError.Invoke(getResponse(error)); });
         }
+#endif
         [MonoPInvokeCallback(typeof(ArctopNativePlugin.SuccessCallback))]
         private static void onLoginSuccess()
         {
@@ -702,14 +725,20 @@ namespace com.arctop
             AddAction(() => { instance.OnPredictionStart.Invoke(); });
         }
         
-        [MonoPInvokeCallback(typeof(ArctopNativePlugin.CalibrationsStatusCallback))]
-        private static void onCalibrationsStatusSuccess(string response)
+        [MonoPInvokeCallback(typeof(ArctopNativePlugin.UserPredictionDataCallback))]
+        private static void onUserPredictionData(string response)
         {
             var parsedData = JsonUtility.FromJson<ArctopSDK.ArctopPredictionDataArray>(response);
-            AddAction(() => { instance.OnCalibrationsStatus.Invoke(parsedData.dataArray); });
+            AddAction(() => { instance.OnUserPredictionData.Invoke(parsedData.dataArray); });
+        }
+        [MonoPInvokeCallback(typeof(ArctopNativePlugin.SuccessWithIntCallback))]
+        private static void onPermissionRequestResult(int response)
+        {
+            var parsedData = (ArctopSDK.PermissionRequestResult)Enum.ToObject(typeof(ArctopSDK.PermissionRequestResult), response);
+            AddAction(() => { instance.OnPermissionRequestResult.Invoke(parsedData); });
         }
         
-        [MonoPInvokeCallback(typeof(ArctopNativePlugin.CalibrationsStatusCallback))]
+        [MonoPInvokeCallback(typeof(ArctopNativePlugin.AllowedPredictionsDataCallback))]
         private static void onAvailablePredictions(string response)
         {
             var parsed = JsonUtility.FromJson<ArctopSDK.UnityPredictionIds>(response);

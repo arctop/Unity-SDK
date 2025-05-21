@@ -317,9 +317,7 @@ SWIFT_EXTERN void arctopSDKEndPrediction(void (* _Nonnull onSuccess)(void), void
 
 SWIFT_EXTERN void arctopSDKGetAvailablePredictions(void (* _Nonnull onSuccess)(int8_t * _Nonnull)) SWIFT_NOEXCEPT;
 
-SWIFT_EXTERN void arctopSDKGetUserCalibrationStatus(int8_t * _Nonnull predictionId, void (* _Nonnull onSuccess)(NSInteger)) SWIFT_NOEXCEPT;
-
-SWIFT_EXTERN void arctopSDKGetUserCalibrationsStatus(int8_t * _Nonnull predictionsIds, void (* _Nonnull onSuccess)(int8_t * _Nonnull)) SWIFT_NOEXCEPT;
+SWIFT_EXTERN void arctopSDKGetUserPredictionData(void (* _Nonnull onSuccess)(int8_t * _Nonnull)) SWIFT_NOEXCEPT;
 
 SWIFT_EXTERN void arctopSDKInit(int8_t * _Nonnull apiKey, int8_t * _Nonnull bundleId, void (* _Nonnull onSuccess)(void), void (* _Nonnull onFailure)(NSInteger)) SWIFT_NOEXCEPT;
 
@@ -328,6 +326,8 @@ SWIFT_EXTERN void arctopSDKIsUserLoggedIn(void (* _Nonnull isLoggedIn)(BOOL)) SW
 SWIFT_EXTERN void arctopSDKLogin(int8_t * _Nonnull otp, void (* _Nonnull onSuccess)(void), void (* _Nonnull onFailure)(NSInteger)) SWIFT_NOEXCEPT;
 
 SWIFT_EXTERN void arctopSDKLogout(void (* _Nonnull onComplete)(void), void (* _Nonnull onFailure)(NSInteger)) SWIFT_NOEXCEPT;
+
+SWIFT_EXTERN void arctopSDKRequestPermissions(void (* _Nonnull onSuccess)(NSInteger)) SWIFT_NOEXCEPT;
 
 SWIFT_EXTERN void arctopSDKScanForDevices(void (* _Nonnull callback)(int8_t * _Nonnull)) SWIFT_NOEXCEPT;
 

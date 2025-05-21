@@ -6,16 +6,18 @@ namespace com.arctop
     /// Helper static class holding constants used throughout the Arctop SDK
     /// </summary>
     public static class ArctopSDK
-    {   
+    {
         /// <summary>
         /// Permission name used in Android
         /// </summary>
         public const string ARCTOP_PERMISSION = "com.arctop.permission.ARCTOP_DATA";
+
         /// <summary>
         /// Connection status of headband
         /// </summary>
         [Serializable]
-        public enum ConnectionState {
+        public enum ConnectionState
+        {
             Unknown,
             Connecting,
             Connected,
@@ -23,6 +25,7 @@ namespace com.arctop
             Disconnected,
             DisconnectedUponRequest
         }
+
         /// <summary>
         /// QA Failure type, for realtime QA callbacks
         /// </summary>
@@ -34,6 +37,7 @@ namespace com.arctop
             MotionTooHigh,
             EEGFailure
         }
+
         /// <summary>
         /// SDK Bind errors for Android
         /// </summary>
@@ -45,49 +49,58 @@ namespace com.arctop
             /// This means that the Arctop app isn't installed on the device
             /// </summary>
             ServiceNotFound,
+
             /// <summary>
             /// Should never really be an issue, but somehow, the system found multiple services
             /// registered to handle the Arctop signature.
             /// </summary>
             MultipleServicesFound,
+
             /// <summary>
             /// Permission to query services was denied, check your manifest
             /// </summary>
             PermissionDenied,
             UnknownError
         }
+
         /// <summary>
         /// User calibration status responses
         /// </summary>
         [Serializable]
-        public enum UserCalibrationStatus 
+        public enum UserCalibrationStatus
         {
             /// <summary>
             /// The user is not calibrated, direct them to the Arctop app for calibration
             /// </summary>
             Unknown = -100,
+
             /// <summary>
             /// The user is not calibrated, direct them to the Arctop app for calibration
             /// </summary>
             NeedsCalibration = 0,
+
             /// <summary>
             /// Calibration has been completed and is in process, models should be available
             /// within a few minutes
             /// </summary>
-            CalibrationDone = 1 ,
+            CalibrationDone = 1,
+
             /// <summary>
             /// Models are available and predictions can be run
             /// </summary>
             ModelsAvailable = 2,
+
             /// <summary>
             /// User has been blocked from the system
             /// </summary>
             Blocked = -1,
+
             /// <summary>
             /// This prediction is locked by other predictions as prerequisite calibrations
             /// </summary>
             LockedByOthers = 11
         }
+
         [Serializable]
         public enum ResponseCodes
         {
@@ -107,22 +120,34 @@ namespace com.arctop
             ModelsNotAvailable = -11,
             PredictionNotAvailable = -12,
         }
+
         [Serializable]
         public enum LoginStatus
         {
             NotLoggedIn = 0,
             LoggedIn = 1
         }
+
+        [Serializable]
+        public enum PermissionRequestResult
+        {
+            Granted = 0,
+            Denied = 1,
+            Customized = 2,
+            FailedNoUserDataAvailable = 3,
+            AllPredictionsAlreadyGranted = 4
+        }
         
         
         [Serializable]
         public struct ArctopPredictionData
         {
-            public string PredictionId;
-            public string PredictionName;
-            public string PredictionTitle;
-            public UserCalibrationStatus CalibrationStatus;
+            public string predictionId;
+            public string predictionName;
+            public string predictionTitle;
+            public UserCalibrationStatus calibrationStatus;
             public string iconKey;
+            public bool predictionPermissionStatus;
         }
         // These are just wrappers to help with JSON serialization
         [Serializable]

@@ -1,6 +1,6 @@
 {
   "name": "com.arctop.arctopsdk",
-  "version": "1.14.1",
+  "version": "1.15.0",
   "displayName": "Arctop SDK",
   "description": "Arctop SDK For Unity",
   "unity": "2020.1",

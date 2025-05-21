@@ -17,6 +17,9 @@ public class ArctopConnectionController : MonoBehaviour
     [SerializeField] private GameObject m_ScanPanel;
     [SerializeField] private GameObject m_SplashPanel;
     [SerializeField] private GameObject m_PredictionsPanel;
+    [SerializeField] private GameObject m_permissionsPanel;
+    [SerializeField] private GameObject m_requestPermissionText;
+    [SerializeField] private GameObject m_permissionDeniedText;
     [SerializeField] private TMP_Text m_MessagePanel;
     [SerializeField] private Button startPredictionButton;
     [SerializeField] private UnityEvent<ArctopSDK.ArctopPredictionData[]> OnCalibratedPredictions;
@@ -100,15 +103,15 @@ public class ArctopConnectionController : MonoBehaviour
     {
         m_AvailablePredictions = preds;
         m_MessagePanel.text = "Verifying Calibrations...";
-        m_ArctopClient.GetUserCalibrationsStatus(m_AvailablePredictions);
+        m_ArctopClient.GetUserPredictionDataStatus();
     }
 
-    public void OnCalibrationsStatus(ArctopSDK.ArctopPredictionData[] statusArray)
+    public void OnUserPredictionData(ArctopSDK.ArctopPredictionData[] statusArray)
     {
         m_predictionsData = statusArray;
         var onlyCalibrated =
             m_predictionsData.Where(x =>
-                x.CalibrationStatus == ArctopSDK.UserCalibrationStatus.ModelsAvailable).ToArray();
+                x.calibrationStatus == ArctopSDK.UserCalibrationStatus.ModelsAvailable).ToArray();
         OnCalibratedPredictions?.Invoke(onlyCalibrated);
         m_PredictionsPanel.SetActive(true);
     }
@@ -116,8 +119,7 @@ public class ArctopConnectionController : MonoBehaviour
     public void OnUserCalibrationStatus(ArctopSDK.UserCalibrationStatus status)
     {
         /*
-            TODO: This is currently rigged only for android. this is legacy and for
-                  backwards compatibility only
+            TODO: This is currently rigged only for android. this is legacy and for backwards compatibility only
         */
         #if UNITY_ANDROID
         switch (status)
@@ -153,9 +155,64 @@ public class ArctopConnectionController : MonoBehaviour
     {
         m_PredictionsToStart = ids;
         m_PredictionsPanel.SetActive(false);
-        m_ScanPanel.SetActive(true);
+        if (allPredictionsHavePermissions())
+        {
+            m_ScanPanel.SetActive(true);
+        }
+        else
+        {
+            ShowPermissionRequestPanel();
+        }
     }
 
+    private bool allPredictionsHavePermissions()
+    {
+        return m_predictionsData.Where(x => m_PredictionsToStart.Contains(x.predictionId))
+            .All(x => x.predictionPermissionStatus);
+    }
+
+    private void ShowPermissionDeniedPanel()
+    {
+        m_requestPermissionText.SetActive(false);
+        m_permissionDeniedText.SetActive(true);
+        m_permissionsPanel.SetActive(true);
+    }
+
+    private void ShowPermissionRequestPanel()
+    {
+        m_requestPermissionText.SetActive(true);
+        m_permissionDeniedText.SetActive(false);
+        m_permissionsPanel.SetActive(true);
+    }
+
+    public void OnPermissionRequestResponse(ArctopSDK.PermissionRequestResult response)
+    {
+        switch (response)
+        {
+            case ArctopSDK.PermissionRequestResult.Denied:
+                ShowPermissionDeniedPanel();
+                break;
+            case ArctopSDK.PermissionRequestResult.Customized:
+                if (allPredictionsHavePermissions())
+                {
+                    m_permissionsPanel.SetActive(false);
+                    m_ScanPanel.SetActive(true);
+                }
+                else
+                {
+                    ShowPermissionDeniedPanel();
+                }
+                break;
+            case ArctopSDK.PermissionRequestResult.FailedNoUserDataAvailable:
+                // TODO: Handle this error
+                break;
+            case ArctopSDK.PermissionRequestResult.AllPredictionsAlreadyGranted:
+            case ArctopSDK.PermissionRequestResult.Granted:
+                m_permissionsPanel.SetActive(false);
+                m_ScanPanel.SetActive(true);
+                break;
+        }
+    }
     public void StartPrediction()
     {
         ArctopSDK.UnityPredictionIds ids = new ArctopSDK.UnityPredictionIds

@@ -17,11 +17,12 @@ import _SwiftConcurrencyShims
 import os.log
 import os
 public struct ArctopPredictionData : Swift.Codable {
-  public let PredictionId: Swift.String
-  public let PredictionName: Swift.String
-  public let PredictionTitle: Swift.String
-  public let CalibrationStatus: ArctopSDK.UserCalibrationStatus
+  public let predictionId: Swift.String
+  public let predictionName: Swift.String
+  public let predictionTitle: Swift.String
+  public let calibrationStatus: ArctopSDK.UserCalibrationStatus
   public let iconKey: Swift.String
+  public let predictionPermissionStatus: Swift.Bool
   public func encode(to encoder: any Swift.Encoder) throws
   public init(from decoder: any Swift.Decoder) throws
 }
@@ -54,9 +55,8 @@ public protocol ArctopSDKApi {
   func terminateScanForDevices() throws
   func connectSensorDevice(deviceId: Swift.String) throws
   func disconnectSensorDevice() throws
-  func checkUserCalibrationStatus(predictionId: Swift.String) -> ArctopSDK.UserCalibrationStatus
-  func checkUserCalibrationsStatus(predictionsIds: [Swift.String]) -> [ArctopSDK.ArctopPredictionData]
   func isUserLoggedIn() async throws -> Swift.Bool
+  func requestPermissions(onComplete: @escaping (ArctopSDK.PermissionRequestResult) -> Swift.Void) throws
   func startPredictionSession(_ predictionId: Swift.String) async -> Swift.Result<Swift.Bool, any Swift.Error>
   func startMultiPredictionSession(_ predictionsId: [Swift.String]) async -> Swift.Result<Swift.Bool, any Swift.Error>
   func finishSession() async -> Swift.Result<Swift.Bool, any Swift.Error>
@@ -68,6 +68,7 @@ public protocol ArctopSDKApi {
   func registerListener(listener: any ArctopSDK.ArctopSDKQAListener)
   func unregisterListener(listener: any ArctopSDK.ArctopSDKQAListener)
   var clientAllowedPredictions: [Swift.String] { get }
+  var userPredictionsData: [ArctopSDK.ArctopPredictionData] { get }
 }
 public enum UserCalibrationStatus : Swift.Int, Swift.Codable {
   case unknown, blocked, needsCalibration, calibrationDone, modelsAvailable, lockedByOthers
@@ -118,6 +119,7 @@ public enum PredictionError : Foundation.LocalizedError {
   case ServerError
   case RealtimeServiceFailed
   case UserModelsNotAvailable
+  case DependencyResolutionFailed
   public var recoverySuggestion: Swift.String? {
     get
   }
@@ -160,7 +162,7 @@ public enum QAFailureType : Swift.Int {
   }
 }
 public enum ArctopSDKError : Swift.Error {
-  case unknownError, apiKeyInvalid, sdkAlreadyInitialized, sdkNotInitialized, predicitionUnauthorized, predictionNotCalibrated
+  case unknownError, apiKeyInvalid, sdkAlreadyInitialized, sdkNotInitialized, predicitionUnauthorized, predictionNotCalibrated, predictionPermissionDenied
   public static func == (a: ArctopSDK.ArctopSDKError, b: ArctopSDK.ArctopSDKError) -> Swift.Bool
   public func hash(into hasher: inout Swift.Hasher)
   public var hashValue: Swift.Int {
@@ -183,8 +185,11 @@ public enum QAQuality {
     get
   }
 }
-public class ArctopSDKClient : ArctopSDK.ArctopSDKApi {
+public class ArctopSDKClient : ArctopSDK.ArctopSDKApi, @unchecked Swift.Sendable {
   public var clientAllowedPredictions: [Swift.String] {
+    get
+  }
+  public var userPredictionsData: [ArctopSDK.ArctopPredictionData] {
     get
   }
   public init()
@@ -199,8 +204,6 @@ public class ArctopSDKClient : ArctopSDK.ArctopSDKApi {
   public func terminateScanForDevices() throws
   public func connectSensorDevice(deviceId: Swift.String) throws
   public func disconnectSensorDevice() throws
-  public func checkUserCalibrationStatus(predictionId: Swift.String) -> ArctopSDK.UserCalibrationStatus
-  public func checkUserCalibrationsStatus(predictionsIds: [Swift.String]) -> [ArctopSDK.ArctopPredictionData]
   public func startMultiPredictionSession(_ predictionsIds: [Swift.String]) async -> Swift.Result<Swift.Bool, any Swift.Error>
   public func startPredictionSession(_ predictionId: Swift.String) async -> Swift.Result<Swift.Bool, any Swift.Error>
   public func finishSession() async -> Swift.Result<Swift.Bool, any Swift.Error>
@@ -212,6 +215,7 @@ public class ArctopSDKClient : ArctopSDK.ArctopSDKApi {
   public func unregisterListener(listener: any ArctopSDK.ArctopSDKListener)
   public func registerListener(listener: any ArctopSDK.ArctopSDKQAListener)
   public func unregisterListener(listener: any ArctopSDK.ArctopSDKQAListener)
+  public func requestPermissions(onComplete: @escaping (ArctopSDK.PermissionRequestResult) -> Swift.Void) throws
 }
 public enum ArctopNetworkError : Swift.Error {
   case serverError, notAutherized
@@ -264,7 +268,8 @@ public typealias ConnectionStatusCallback = @convention(c) (Swift.Int, Swift.Int
 public typealias ValueChangedCallback = @convention(c) (ArctopSDK.char_p, Swift.Float) -> Swift.Void
 public typealias QAStatusCallback = @convention(c) (Swift.Bool, Swift.Int) -> Swift.Void
 public typealias SignalQualityCallback = @convention(c) (ArctopSDK.char_p) -> Swift.Void
-public typealias CalibrationsStatusCallback = @convention(c) (ArctopSDK.char_p) -> Swift.Void
+public typealias AllowedPredictionsDataCallback = @convention(c) (ArctopSDK.char_p) -> Swift.Void
+public typealias UserPredictionDataCallback = @convention(c) (ArctopSDK.char_p) -> Swift.Void
 @_cdecl("arctopSDKInit")
 public func arctopSDKInit(apiKey: ArctopSDK.char_p, bundleId: ArctopSDK.char_p, onSuccess: ArctopSDK.SuccessCallback, onFailure: ArctopSDK.FailureWithCodeCallback)
 @_cdecl("arctopSDKShutdown")
@@ -276,11 +281,11 @@ public func arctopSDKIsUserLoggedIn(isLoggedIn: ArctopSDK.IsUserLoggedInCallback
 @_cdecl("arctopSDKLogout")
 public func arctopSDKLogout(onComplete: ArctopSDK.SuccessCallback, onFailure: ArctopSDK.FailureWithCodeCallback)
 @_cdecl("arctopSDKGetAvailablePredictions")
-public func arctopSDKGetAvailablePredictions(onSuccess: ArctopSDK.CalibrationsStatusCallback)
-@_cdecl("arctopSDKGetUserCalibrationStatus")
-public func arctopSDKGetUserCalibrationStatus(predictionId: ArctopSDK.char_p, onSuccess: ArctopSDK.SuccessWithIntCallback)
-@_cdecl("arctopSDKGetUserCalibrationsStatus")
-public func arctopSDKGetUserCalibrationsStatus(predictionsIds: ArctopSDK.char_p, onSuccess: ArctopSDK.CalibrationsStatusCallback)
+public func arctopSDKGetAvailablePredictions(onSuccess: ArctopSDK.AllowedPredictionsDataCallback)
+@_cdecl("arctopSDKGetUserPredictionData")
+public func arctopSDKGetUserPredictionData(onSuccess: ArctopSDK.UserPredictionDataCallback)
+@_cdecl("arctopSDKRequestPermissions")
+public func arctopSDKRequestPermissions(onSuccess: ArctopSDK.SuccessWithIntCallback)
 @_cdecl("arctopSDKScanForDevices")
 public func arctopSDKScanForDevices(callback: ArctopSDK.ScanResultCallback)
 @_cdecl("arctopSDKConnectToDeviceId")
@@ -303,6 +308,18 @@ public func arctopSDKSetQAStatusCallback(qaStatusCallback: ArctopSDK.QAStatusCal
 public func arctopSDKSetValueChangedCallback(valueChangedCallback: ArctopSDK.ValueChangedCallback)
 @_cdecl("arctopSDKSetSignalQualityCallback")
 public func arctopSDKSetSignalQualityCallback(signalQualityCallback: ArctopSDK.SignalQualityCallback)
+public enum PermissionRequestResult : Swift.Int {
+  case granted
+  case denied
+  case customized
+  case failedNoUserDataAvailable
+  case allPredictionsAlreadyGranted
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
 public protocol ArctopSDKQAListener : ObjectiveC.NSObject {
   func onSignalQuality(quality: Swift.String)
   func onHeadbandStatusChange(headbandOn: Swift.Bool)
@@ -344,3 +361,6 @@ extension ArctopSDK.QAQuality : Swift.Equatable {}
 extension ArctopSDK.QAQuality : Swift.Hashable {}
 extension ArctopSDK.ArctopNetworkError : Swift.Equatable {}
 extension ArctopSDK.ArctopNetworkError : Swift.Hashable {}
+extension ArctopSDK.PermissionRequestResult : Swift.Equatable {}
+extension ArctopSDK.PermissionRequestResult : Swift.Hashable {}
+extension ArctopSDK.PermissionRequestResult : Swift.RawRepresentable {}

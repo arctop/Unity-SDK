@@ -5,7 +5,6 @@ using com.arctop;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-
 public class ArctopPredictionPanelController : MonoBehaviour
 {
     [SerializeField] private Button m_startButton;
@@ -23,7 +22,7 @@ public class ArctopPredictionPanelController : MonoBehaviour
             if (m_calibratedPredictions.Length > i)
             {
                 var text = predictionToggles[i].GetComponentInChildren<Text>();
-                text.text = m_calibratedPredictions[i].PredictionTitle;
+                text.text = m_calibratedPredictions[i].predictionTitle;
                 predictionToggles[i].SetActive(true);
                 hasOne = true;
             }
@@ -46,7 +45,7 @@ public class ArctopPredictionPanelController : MonoBehaviour
         {
             if (m_toggles[i].isOn)
             {
-                list.Add(m_calibratedPredictions[i].PredictionId);
+                list.Add(m_calibratedPredictions[i].predictionId);
             }
         }
         setupPredictions?.Invoke(list.ToArray());
